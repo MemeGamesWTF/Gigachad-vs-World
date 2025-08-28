@@ -97,10 +97,17 @@
         }).then((unityInstance) => {
           loadingBar.style.display = "none";
 	  window.unityInstance = unityInstance;
-        }).catch((message) => {
-          alert(message);
+       // flush any queued messages
+        if (window._unityMessageQueue && window._unityMessageQueue.length) {
+        window._unityMessageQueue.forEach(function(msg) {
+            try {
+            window.unityInstance.SendMessage(msg.o, msg.m, msg.p);
+            } catch (e) {
+            console.warn('Flushing queued SendMessage failed', e);
+         }
         });
-      };
+        window._unityMessageQueue = [];
+         };
       document.body.appendChild(script);
     </script>
   </body>
